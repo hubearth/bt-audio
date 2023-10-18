@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+!/usr/bin/python3
 
 import dbus
 import dbus.service
@@ -290,15 +290,8 @@ class MediaTransport():
         else:
             self.logger.debug(str(message.type) + " " + str(message.src))
 
-class MediaTransportSBC(MediaTransport):
 
-
-    def __init__(self, bus, path):
-        super().__init__(bus, path)
-        self.logger = logging.getLogger("MediaTransportSBC")
-
-    def initPipeline(self):
-
+def _initPipeline(self):
         global args
 
         self.pipeline = Gst.Pipeline.new("player")
@@ -314,16 +307,13 @@ class MediaTransportSBC(MediaTransport):
         jitterbuffer = Gst.ElementFactory.make("rtpjitterbuffer", "jitterbuffer")
         jitterbuffer.set_property("latency", args.buff_len)
         jitterbuffer.set_property("drop-on-latency", "true")
+    
 
-        depay = Gst.ElementFactory.make("rtpsbcdepay", "depayloader")
-
-        parse = Gst.ElementFactory.make("sbcparse", "parser")
-
-        decoder = Gst.ElementFactory.make("sbcdec", "decoder")
-
+        
         converter = Gst.ElementFactory.make("audioconvert", "converter")
 
         sink = Gst.ElementFactory.make("alsasink", "alsa-output")
+
         if args.alsadev:
             sink.set_property("device", args.alsadev)
 
@@ -334,7 +324,6 @@ class MediaTransportSBC(MediaTransport):
         self.pipeline.add(decoder)
         self.pipeline.add(converter)
         self.pipeline.add(sink)
-
 
         link = True
         link &= source.link(jitterbuffer)
@@ -349,6 +338,22 @@ class MediaTransportSBC(MediaTransport):
             return
 
         self.logger.debug("Created new SBC pipeline")
+
+
+class MediaTransportSBC(MediaTransport):
+
+
+    def __init__(self, bus, path):
+        super().__init__(bus, path)
+        self.logger = logging.getLogger("MediaTransportSBC")
+
+    def initPipeline(self):
+
+        self.depay = Gst.ElementFactory.make("rtpsbcdepay", "depayloader")
+        self.parse = Gst.ElementFactory.make("sbcparse", "parser")
+        self.decoder = Gst.ElementFactory.make("sbcdec", "decoder")
+
+        _initPipeline(self)
 
 
 class Rejected(dbus.DBusException):
