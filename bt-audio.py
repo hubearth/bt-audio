@@ -325,7 +325,7 @@ class MediaTransportSBC(MediaTransport):
         converter = Gst.ElementFactory.make("audioconvert", "converter")
 
         if args.pulse:
-            sink.set_property("pulsesink", args.alsadev)
+            sink = Gst.ElementFactory.make("pulsesink", None)
         else:
             sink = Gst.ElementFactory.make("alsasink", "alsa-output")
             if args.alsadev:
